@@ -1,0 +1,100 @@
+<svg width="900" height="470" viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent trace: what passed, retried, fell back, got rejected, and got rolled back">
+  <defs>
+    <style>
+      .mono { font-family: 'SFMono-Regular', ui-monospace, Menlo, Consolas, monospace; }
+      .lbl  { font-size: 10px; letter-spacing: 4px; fill: rgba(255,255,255,0.32); }
+      .op   { font-size: 10px; letter-spacing: 1.5px; font-weight: 700; }
+      .txt  { font-size: 12.5px; fill: rgba(255,255,255,0.88); }
+      .sub  { font-size: 10.5px; fill: rgba(255,255,255,0.38); }
+      .rule { stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+      .row  { opacity: 0; animation: in .5s ease-out forwards; }
+      .r1 { animation-delay: .3s }  .r2 { animation-delay: .9s }  .r3 { animation-delay: 1.5s }
+      .r4 { animation-delay: 2.1s } .r5 { animation-delay: 2.7s } .r6 { animation-delay: 3.3s }
+      @keyframes in { from { opacity: 0; transform: translateX(-10px) } to { opacity: 1; transform: translateX(0) } }
+      .dag  { font-size: 11px; fill: rgba(255,255,255,0.55); }
+      .on   { animation: step 5s infinite; }
+      .s1 { animation-delay: 0s } .s2 { animation-delay: 1s } .s3 { animation-delay: 2s } .s4 { animation-delay: 3s } .s5 { animation-delay: 4s }
+      @keyframes step { 0%, 18% { fill: #67E8F9 } 22%, 100% { fill: rgba(255,255,255,0.55) } }
+      @media (prefers-reduced-motion: reduce) { .row { animation: none; opacity: 1 } .on, .blink { animation: none !important } }
+    </style>
+  </defs>
+
+  <rect width="900" height="470" fill="#0d1117"/>
+  <rect x="0.5" y="0.5" width="899" height="469" fill="none" stroke="#30363d"/>
+
+  <!-- header -->
+  <text x="28" y="32" class="mono lbl">AGENT TRACE</text>
+  <text x="150" y="32" class="mono lbl" fill="rgba(255,255,255,0.16)">/</text>
+  <text x="170" y="32" class="mono lbl">EVERY STEP HAS A CONTRACT</text>
+  <text x="872" y="32" class="mono lbl" text-anchor="end">run 0x2a·cl</text>
+  <line x1="28" y1="44" x2="872" y2="44" class="rule"/>
+
+  <!-- DAG strip -->
+  <g transform="translate(28, 70)">
+    <text x="0"   y="0" class="mono dag on s1">Intent</text>
+    <text x="62"  y="0" class="mono dag">→</text>
+    <text x="84"  y="0" class="mono dag on s2">Rewrite</text>
+    <text x="154" y="0" class="mono dag">→</text>
+    <text x="176" y="0" class="mono dag on s3">Retrieval</text>
+    <text x="260" y="0" class="mono dag">→</text>
+    <text x="282" y="0" class="mono dag on s4">Answer</text>
+    <text x="338" y="0" class="mono dag">→</text>
+    <text x="360" y="0" class="mono dag on s5">Verify</text>
+    <text x="844" y="0" class="mono sub" text-anchor="end">fixed DAG, not free-form ReAct</text>
+  </g>
+  <line x1="28" y1="88" x2="872" y2="88" class="rule"/>
+
+  <!-- PASS -->
+  <g class="row r1"><g transform="translate(28, 120)">
+    <rect x="0" y="-14" width="80" height="19" fill="rgba(74,222,128,0.12)" stroke="rgba(74,222,128,0.45)"/>
+    <text x="10" y="0" class="mono op" fill="#4ADE80">PASS</text>
+    <text x="100" y="0" class="mono txt">Retrieval the model cannot skip. Citations it cannot invent.</text>
+    <text x="100" y="18" class="mono sub">clausewise / answer accuracy 82.6% → 93.1% / citation correctness 96.1%</text>
+  </g></g>
+  <line x1="28" y1="150" x2="872" y2="150" class="rule"/>
+
+  <!-- RETRY -->
+  <g class="row r2"><g transform="translate(28, 184)">
+    <rect x="0" y="-14" width="80" height="19" fill="rgba(250,204,21,0.10)" stroke="rgba(250,204,21,0.45)"/>
+    <text x="10" y="0" class="mono op" fill="#FACC15">RETRY ×2</text>
+    <text x="100" y="0" class="mono txt">Verifier bounced an unsupported claim. Then it said "not enough evidence."</text>
+    <text x="100" y="18" class="mono sub">safe refusal 71.5% → 97.3% / a confident wrong answer costs more than silence</text>
+  </g></g>
+  <line x1="28" y1="214" x2="872" y2="214" class="rule"/>
+
+  <!-- FALLBACK -->
+  <g class="row r3"><g transform="translate(28, 248)">
+    <rect x="0" y="-14" width="80" height="19" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.45)"/>
+    <text x="10" y="0" class="mono op" fill="#60A5FA">FALLBACK</text>
+    <text x="100" y="0" class="mono txt">Reranker timed out. Served RRF order instead of guessing.</text>
+    <text x="100" y="18" class="mono sub">degrade the latency, never the trust / P95 stays inside budget</text>
+  </g></g>
+  <line x1="28" y1="278" x2="872" y2="278" class="rule"/>
+
+  <!-- REJECT -->
+  <g class="row r4"><g transform="translate(28, 312)">
+    <rect x="0" y="-14" width="80" height="19" fill="rgba(248,113,113,0.12)" stroke="rgba(248,113,113,0.45)"/>
+    <text x="10" y="0" class="mono op" fill="#F87171">REJECT</text>
+    <text x="100" y="0" class="mono txt" fill="rgba(255,255,255,0.36)">Put all 100+ tools in the prompt and let the model pick.</text>
+    <line x1="100" y1="-4" x2="508" y2="-4" stroke="rgba(255,255,255,0.32)"/>
+    <text x="100" y="18" class="mono sub">replaced at Transsion / retrieve tools on demand / prompt −54.7%, Recall@5 95.4%</text>
+  </g></g>
+  <line x1="28" y1="342" x2="872" y2="342" class="rule"/>
+
+  <!-- ROLLBACK -->
+  <g class="row r5"><g transform="translate(28, 376)">
+    <rect x="0" y="-14" width="80" height="19" fill="rgba(192,132,252,0.12)" stroke="rgba(192,132,252,0.45)"/>
+    <text x="10" y="0" class="mono op" fill="#C084FC">ROLLBACK</text>
+    <text x="100" y="0" class="mono txt">A Skill that looked better offline. The 5% canary disagreed.</text>
+    <text x="100" y="18" class="mono sub">feedback → Reflect → Skill / 5% → 20% → 50% / auto-rollback on regression</text>
+  </g></g>
+  <line x1="28" y1="406" x2="872" y2="406" class="rule"/>
+
+  <!-- footer -->
+  <g class="row r6">
+    <text x="28" y="438" class="mono sub">trace closed · every step has a contract, a timeout and a fallback</text>
+    <rect class="blink" x="508" y="429" width="7" height="11" fill="rgba(103,232,249,0.7)">
+      <animate attributeName="opacity" values="1;1;0;0" dur="1.15s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+</svg>
